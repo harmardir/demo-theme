@@ -7,11 +7,82 @@
 
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="container about">
+        <!-- Page Header -->
         <h1>
-            <%block name="pageheader">${page_header or _("Privacy Policy")}</%block>
+            <%block name="pageheader">${_("Privacy Policy")}</%block>
         </h1>
-        <p>
-            <%block name="pagecontent">${page_content or _("This page left intentionally blank. Feel free to add your own content.")}</%block>
-        </p>
+        
+        <!-- Page Content -->
+        <%block name="pagecontent">
+            <p>${_("Your privacy is important to us. Here's how we handle your data.")}</p>
+
+            <!-- Collapsible Sections -->
+            <div class="accordion" id="privacyAccordion">
+                <!-- Section 1 -->
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h2>
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne">
+                                ${_("What Information Do We Collect?")}
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseOne" class="collapse show" data-parent="#privacyAccordion">
+                        <div class="card-body">
+                            ${_("We collect data such as your name, email, and browsing behavior to enhance your experience.")}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="card">
+                    <div class="card-header" id="headingTwo">
+                        <h2>
+                            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo">
+                                ${_("How Do We Use Your Information?")}
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseTwo" class="collapse" data-parent="#privacyAccordion">
+                        <div class="card-body">
+                            ${_("We use your information to personalize content, improve our services, and provide support.")}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="card">
+                    <div class="card-header" id="headingThree">
+                        <h2>
+                            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree">
+                                ${_("How Do We Protect Your Data?")}
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseThree" class="collapse" data-parent="#privacyAccordion">
+                        <div class="card-body">
+                            ${_("We implement industry-standard security measures to safeguard your personal data.")}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <h2>${_("Contact Us")}</h2>
+            <p>${_("If you have any questions or concerns, please contact us using the form below:")}</p>
+
+            <form action="/contact" method="POST">
+                <label for="name">${_("Name:")}</label><br>
+                <input type="text" id="name" name="name" required><br><br>
+
+                <label for="email">${_("Email:")}</label><br>
+                <input type="email" id="email" name="email" required><br><br>
+
+                <label for="message">${_("Message:")}</label><br>
+                <textarea id="message" name="message" rows="4" required></textarea><br><br>
+
+                <button type="submit">${_("Submit")}</button>
+            </form>
+        </%block>
     </section>
 </main>
