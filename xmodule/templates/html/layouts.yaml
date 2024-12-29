@@ -1,0 +1,12 @@
+- name: predefined_layout
+  display_name: Predefined Layout (Image Right, Text Left)
+  template: "html/predefined_layout.html"
+  parameters:
+    - name: text
+      type: string
+      display_name: Text
+      default: "This is a placeholder text."
+    - name: image_url
+      type: string
+      display_name: Image URL
+      default: "https://www.example.com/image.jpg"

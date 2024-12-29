@@ -1,0 +1,43 @@
+{% load wiki_tags i18n %}
+{% include "wiki/includes/editormedia.html" %}
+
+<div>
+  <!-- Existing form for the editor -->
+  {% wiki_form edit_form %}
+  
+  <!-- New dropdown for selecting layout -->
+  <label for="layout_select">Select Layout</label>
+  <select id="layout_select" onchange="loadLayout()">
+    <option value="default">Default Layout</option>
+    <option value="image_left_text_right">Image Left, Text Right</option>
+    <option value="text_left_image_right">Text Left, Image Right</option>
+    <!-- Add more layout options as needed -->
+  </select>
+</div>
+
+<script language="javascript">
+  $(document).ready(function() {
+    // Existing JS code for handling focus and revision ID
+    $("#id_revision").val('{{ article.current_revision.id }}');
+    $("#div_id_title > .controls").attr('tabindex', -1).focus();
+  });
+
+  // Function to handle layout selection
+  function loadLayout() {
+    var selectedLayout = document.getElementById('layout_select').value;
+    var contentArea = document.getElementById('content_area'); // The ID of your content area element
+
+    // Inject the selected layout HTML into the content area
+    switch (selectedLayout) {
+      case 'image_left_text_right':
+        contentArea.innerHTML = '<div class="image-left-text-right"><img src="your-image.jpg" alt="Image"><p>Your text here...</p></div>';
+        break;
+      case 'text_left_image_right':
+        contentArea.innerHTML = '<div class="text-left-image-right"><p>Your text here...</p><img src="your-image.jpg" alt="Image"></div>';
+        break;
+      default:
+        contentArea.innerHTML = '<p>Default content...</p>';
+        break;
+    }
+  }
+</script>
