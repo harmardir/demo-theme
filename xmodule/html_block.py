@@ -31,6 +31,10 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, name_to_pathname
+import pkg_resources
+from xblock.core import XBlock
+from xblock.fields import Scope, String
+from xblock.fragment import Fragment
 
 log = logging.getLogger("edx.courseware")
 
@@ -489,3 +493,74 @@ class CourseInfoBlock(CourseInfoFields, HtmlBlockMixin):  # lint-amnesty, pylint
             return datetime.strptime(date, '%B %d, %Y')
         except ValueError:  # occurs for ill-formatted date values
             return datetime.today()
+class HtmlBlock(XBlock):
+    """
+    XBlock for authoring HTML content with predefined layouts.
+    """
+
+    # Fields to store data
+    content = String(help="HTML content for the block", default="<p>Your content here</p>", scope=Scope.content)
+    layout = String(help="Selected layout for the block", default="default", scope=Scope.content)
+
+    LAYOUTS = {
+        "default": "<p>Your content here</p>",
+        "image-right-text-left": "<div style='display: flex;'><div style='flex: 1;'>Text here</div><div style='flex: 1;'><img src='image.jpg' alt='Image' style='width: 100%;'></div></div>",
+        "text-right-image-left": "<div style='display: flex;'><div style='flex: 1;'><img src='image.jpg' alt='Image' style='width: 100%;'></div><div style='flex: 1;'>Text here</div></div>"
+    }
+
+    def resource_string(self, path):
+        """Helper to get resources from the kit."""
+        data = pkg_resources.resource_string(__name__, path)
+        return data.decode("utf8")
+
+    def student_view(self, context=None):
+        """Primary view for students."""
+        html = f"<div>{self.content}</div>"
+        frag = Fragment(html)
+        frag.add_css(self.resource_string("static/css/html_block.css"))
+        frag.add_javascript(self.resource_string("static/js/html_block.js"))
+        frag.initialize_js('HtmlBlock')
+        return frag
+
+    def studio_view(self, context=None):
+        """Studio view for editing the block."""
+        html = f"""
+        <div>
+            <label for="html-content">HTML Content:</label>
+            <textarea id="html-content" name="content" rows="5" style="width: 100%;">{self.content}</textarea>
+            <br>
+            <label for="layout-select">Select Layout:</label>
+            <select id="layout-select" name="layout">
+                {self._generate_layout_options()}
+            </select>
+        </div>
+        <script>
+        document.getElementById('layout-select').addEventListener('change', function() {
+            const contentInput = document.getElementById('html-content');
+            const selectedLayout = this.value;
+            const layoutMap = {""" + ",".join([f'\"{key}\": \"{value}\"' for key, value in self.LAYOUTS.items()]) + """};
+            contentInput.value = layoutMap[selectedLayout] || "<p>Your content here</p>";
+        });
+        </script>
+        """
+        frag = Fragment(html)
+        frag.add_css(self.resource_string("static/css/html_block.css"))
+        frag.add_javascript(self.resource_string("static/js/html_block_studio.js"))
+        frag.initialize_js('HtmlBlockStudio')
+        return frag
+
+    def _generate_layout_options(self):
+        """Helper to generate layout options for the dropdown."""
+        options = ""
+        for key in self.LAYOUTS:
+            selected = "selected" if key == self.layout else ""
+            options += f"<option value='{key}' {selected}>{key.replace('-', ' ').title()}</option>"
+        return options
+
+    @XBlock.json_handler
+    def save_studio_view(self, data, suffix=''):
+        """Save handler for the studio view."""
+        self.content = data.get('content', self.content)
+        self.layout = data.get('layout', self.layout)
+        return {"result": "success"}
+
