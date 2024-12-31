@@ -2,10 +2,8 @@
 {% include "wiki/includes/editormedia.html" %}
 
 <div>
-  <!-- Existing form for the editor -->
   {% wiki_form edit_form %}
   
-  <!-- New dropdown for selecting layout -->
   <label for="layout_select">Select Layout</label>
   <select id="layout_select" onchange="loadLayout()">
     <option value="default">Default Layout</option>
